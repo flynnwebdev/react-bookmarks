@@ -6,13 +6,25 @@ import HomePage from "./pages/HomePage";
 import NotFoundPage from "./pages/NotFoundPage";
 
 class App extends Component {
+    state = { token: sessionStorage.getItem("token") }
+
+    onRegisterFormSubmit = (token, cb) => {
+        sessionStorage.setItem("token", token);
+        this.setState({ token }, cb);
+    }
+    
     render() {
+        const { token } = this.state;
+
         return (
             <BrowserRouter>
                 <div>
+                    { token && <h4>User is logged in!</h4>}
                     <Switch>
                         <Route exact path="/" component={HomePage} />
-                        <Route exact path="/register" component={RegisterPage} />
+                        <Route exact path="/register" render={(props) => {
+                            return <RegisterPage {...props} onRegisterFormSubmit={this.onRegisterFormSubmit}  />
+                        }} />
                         <Route component={NotFoundPage} />
                     </Switch>
                 </div>

@@ -3,10 +3,12 @@ import RegisterForm from "./../forms/RegisterForm";
 
 class RegisterPage extends Component {
     render() {
+        //console.log(this.props);
+        
         return(
             <div>
                 <h1>Register a new user</h1>
-                <RegisterForm />
+                <RegisterForm onRegisterFormSubmit={this.props.onRegisterFormSubmit} />
             </div>
         );
     }
