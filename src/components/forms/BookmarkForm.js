@@ -1,34 +1,37 @@
 import React, {Component} from "react";
 import { connect } from "react-redux";
 import { createBookmark } from "./../../actions";
+import { reduxForm, Field } from "redux-form";
+import Input from "./fields/Input";
 
-class BookmarkForm extends Component {
-    state = { title: "", url: ""}
-    
-    onFormSubmit = async (event) => {
-        event.preventDefault();
-        const { title, url } = this.state;
-        const { createBookmark } = this.props;
 
+class BookmarkForm extends Component {    
+    onFormSubmit = async (formValues) => {
+        const { title, url } = formValues;
+        const { createBookmark, reset } = this.props;
         createBookmark({ title, url });
-    }
-
-    onInputChange = (name, event) => {
-        this.setState({ [name]: event.target.value });
+        reset();
     }
 
     render() {
-        const { title, url } = this.state;
-
+        const { handleSubmit } = this.props;
         return (
-            <form onSubmit={this.onFormSubmit}>
+            <form onSubmit={handleSubmit(this.onFormSubmit)}>
                 <p>
                     <label htmlFor="title">Title</label>
-                    <input type="text" value={title} onChange={(event) => this.onInputChange("title", event)} />
+                    <Field
+                        type="text"
+                        name="title"
+                        component={Input}
+                    />
                 </p>
                 <p>
                     <label htmlFor="url">Url</label>
-                    <input type="text" value={url} onChange={(event) => this.onInputChange("url", event)} />
+                    <Field
+                        type="text"
+                        name="url"
+                        component={Input}
+                    />
                 </p>
                 <p>
                     <input type="submit" value="Create New Bookmark" />
@@ -38,6 +41,23 @@ class BookmarkForm extends Component {
     }
 }
 
+const WrappedBookmarkForm = reduxForm({
+    form: "bookmark",
+    validate: ({ title, url }) => {
+        const errors = {};
+
+        if (!title) {
+            errors.title = "Title is required!"
+        }
+
+        if (!url) {
+            errors.url = "Url is required!"
+        }
+
+        return errors;
+    }
+})(BookmarkForm);
+
 export default connect(null, {
     createBookmark
-})(BookmarkForm);
+})(WrappedBookmarkForm);
