@@ -1,63 +1,57 @@
-import React, {Component} from "react";
-import { connect } from "react-redux";
-import { createBookmark } from "./../../actions";
-import { reduxForm, Field } from "redux-form";
-import Input from "./fields/Input";
+import React, { Component } from "react";
+import axios from "axios";
 
+export default class BookmarkForm extends Component {
+  state = {
+    title: "",
+    url: ""
+  };
 
-class BookmarkForm extends Component {    
-    onFormSubmit = async (formValues) => {
-        const { title, url } = formValues;
-        const { createBookmark, reset } = this.props;
-        createBookmark({ title, url });
-        reset();
-    }
+  onTitleChange = event => {
+    this.setState({ title: event.target.value });
+  };
 
-    render() {
-        const { handleSubmit } = this.props;
-        return (
-            <form onSubmit={handleSubmit(this.onFormSubmit)}>
-                <p>
-                    <label htmlFor="title">Title</label>
-                    <Field
-                        type="text"
-                        name="title"
-                        component={Input}
-                    />
-                </p>
-                <p>
-                    <label htmlFor="url">Url</label>
-                    <Field
-                        type="text"
-                        name="url"
-                        component={Input}
-                    />
-                </p>
-                <p>
-                    <input type="submit" value="Create New Bookmark" />
-                </p>
-            </form>
-        );
-    }
+  onURLChange = event => {
+    this.setState({ url: event.target.value });
+  };
+
+  onFormSubmit = event => {
+    const { title, url } = this.state;
+    event.preventDefault();
+    axios
+      .post(
+        "http://localhost:3001/bookmarks",
+        { title, url },
+        {
+          headers: { Authorization: "Bearer " + sessionStorage.getItem("token") }
+        }
+      )
+      .then(res => this.props.updateBookmarks(res.data));
+  };
+
+  render() {
+    return (
+      <form onSubmit={this.onFormSubmit}>
+        <p>
+          <label>Title</label>
+          <input
+            type="text"
+            value={this.state.title}
+            onChange={this.onTitleChange}
+          />
+        </p>
+        <p>
+          <label>URL</label>
+          <input
+            type="text"
+            value={this.state.url}
+            onChange={this.onURLChange}
+          />
+        </p>
+        <p>
+          <button>Create New Bookmark</button>
+        </p>
+      </form>
+    );
+  }
 }
-
-const WrappedBookmarkForm = reduxForm({
-    form: "bookmark",
-    validate: ({ title, url }) => {
-        const errors = {};
-
-        if (!title) {
-            errors.title = "Title is required!"
-        }
-
-        if (!url) {
-            errors.url = "Url is required!"
-        }
-
-        return errors;
-    }
-})(BookmarkForm);
-
-export default connect(null, {
-    createBookmark
-})(WrappedBookmarkForm);

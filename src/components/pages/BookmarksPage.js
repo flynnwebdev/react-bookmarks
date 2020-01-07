@@ -1,9 +1,7 @@
 import React, {Component} from "react";
 import BookmarkForm from "./../forms/BookmarkForm";
-import { connect } from "react-redux";
-import { fetchBookmarks } from "./../../actions";
 
-class BookmarksPage extends Component {
+export default class BookmarksPage extends Component {
     componentDidMount() {
         const { fetchBookmarks } = this.props;
         fetchBookmarks();
@@ -15,7 +13,7 @@ class BookmarksPage extends Component {
         return (
             <div>
                 <h2>New Bookmark</h2>
-                <BookmarkForm />
+                <BookmarkForm updateBookmarks={this.props.updateBookmarks} />
                 <h2>My Bookmarks</h2>
                 <ul>
                     {bookmarks.map(bookmark => {
@@ -30,13 +28,3 @@ class BookmarksPage extends Component {
         );
     }
 }
-
-const mapStateToProps = (state) => {
-    return {
-        bookmarks: state.bookmarks
-    }
-}
-
-export default connect(mapStateToProps, {
-    fetchBookmarks
-})(BookmarksPage);
