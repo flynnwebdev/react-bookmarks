@@ -1,10 +1,7 @@
 import React, { Component } from "react";
 import axios from "axios";
-import { withRouter } from "react-router-dom";
-import { setAuthToken } from "./../../actions";
-import { connect } from "react-redux";
 
-class RegisterForm extends Component {
+export default class RegisterForm extends Component {
   state = {
     email: "",
     password: ""
@@ -18,17 +15,6 @@ class RegisterForm extends Component {
       .post("http://localhost:3001/auth/register", { email, password })
         .then(res => { this.props.onRegister(res.data.token); this.props.history.push("/") })
       .catch(err => console.error(err));
-
-    // fetch("http://localhost:3001/auth/register", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json"
-    //   },
-    //   body: JSON.stringify({ email, password })
-    // })
-    //   .then(response => response.json())
-    //   .then(data => console.log(data))
-    //   .catch(err => console.error(err));
   };
 
   onInputChange = (name, event) => {
@@ -65,6 +51,3 @@ class RegisterForm extends Component {
   }
 }
 
-export default connect(null, {
-  setAuthToken
-})(withRouter(RegisterForm));

@@ -5,11 +5,9 @@ import RegisterPage from "./pages/RegisterPage";
 import HomePage from "./pages/HomePage";
 import NotFoundPage from "./pages/NotFoundPage";
 import BookmarksPage from "./pages/BookmarksPage";
-import PrivateRoute from "./PrivateRoute";
-import { connect } from "react-redux";
 import axios from "axios";
 
-class App extends Component {
+export default class App extends Component {
   state = {
     token: sessionStorage.getItem("token"),
     bookmarks: []
@@ -68,10 +66,3 @@ class App extends Component {
   }
 }
 
-const mapStateToProps = state => {
-  return {
-    token: state.auth.token
-  };
-};
-
-export default connect(mapStateToProps)(App);
