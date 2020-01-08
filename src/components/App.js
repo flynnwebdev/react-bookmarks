@@ -1,33 +1,40 @@
 import React, { Component } from "react";
-import { BrowserRouter, Route, Switch } from "react-router-dom";
+import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
 import "./../styles/App.css";
 import RegisterPage from "./pages/RegisterPage";
 import HomePage from "./pages/HomePage";
 import NotFoundPage from "./pages/NotFoundPage";
 import BookmarksPage from "./pages/BookmarksPage";
-import axios from "axios";
+import API from "./api";
 
 export default class App extends Component {
-  state = {
-    token: sessionStorage.getItem("token"),
-    bookmarks: []
-  };
+  constructor(props) {
+    super(props);
+    const token = sessionStorage.getItem("token");
+    this.state = { token, bookmarks: [] };
+
+    if (token) {
+      API.setAuthHeader(token);
+    }
+
+    API.handleTokenExpiry(() => {
+      sessionStorage.clear();
+      this.setState({ token: null });
+    });
+  }
 
   onRegister = token => {
     sessionStorage.setItem("token", token);
     this.setState({ token });
+    API.setAuthHeader(token);
   };
 
   fetchBookmarks = () => {
-    axios
-      .get("http://localhost:3001/bookmarks", {
-        headers: { Authorization: "Bearer " + sessionStorage.getItem("token") }
-      })
-      .then(res => this.setState({ bookmarks: res.data }));
+    API.get("/bookmarks").then(res => this.setState({ bookmarks: res.data }));
   };
 
   updateBookmarks = bookmarks => {
-      this.setState({ bookmarks });
+    this.setState({ bookmarks });
   };
 
   render() {
@@ -49,14 +56,18 @@ export default class App extends Component {
             <Route
               exact
               path="/bookmarks"
-              render={props => (
-                <BookmarksPage
-                  {...props}
-                  bookmarks={this.state.bookmarks}
-                  fetchBookmarks={this.fetchBookmarks}
-                  updateBookmarks={this.updateBookmarks}
-                />
-              )}
+              render={props =>
+                this.state.token ? (
+                  <BookmarksPage
+                    {...props}
+                    bookmarks={this.state.bookmarks}
+                    fetchBookmarks={this.fetchBookmarks}
+                    updateBookmarks={this.updateBookmarks}
+                  />
+                ) : (
+                  <Redirect to="/" />
+                )
+              }
             />
             <Route component={NotFoundPage} />
           </Switch>
@@ -65,4 +76,3 @@ export default class App extends Component {
     );
   }
 }
-

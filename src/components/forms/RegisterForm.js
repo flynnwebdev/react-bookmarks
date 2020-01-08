@@ -1,19 +1,23 @@
 import React, { Component } from "react";
-import axios from "axios";
+import API from "../api";
+import { Redirect } from "react-router-dom";
 
 export default class RegisterForm extends Component {
   state = {
     email: "",
-    password: ""
+    password: "",
+    submit: false
   };
 
   onFormSubmit = event => {
     event.preventDefault();
     const { email, password } = this.state;
 
-    axios
-      .post("http://localhost:3001/auth/register", { email, password })
-        .then(res => { this.props.onRegister(res.data.token); this.props.history.push("/") })
+    API.post("/auth/register", { email, password })
+      .then(res => {
+        this.props.onRegister(res.data.token);
+        this.setState({ submit: true });
+      })
       .catch(err => console.error(err));
   };
 
@@ -22,10 +26,11 @@ export default class RegisterForm extends Component {
   };
 
   render() {
-    console.log(this.props);
     const { email, password } = this.state;
 
-    return (
+    return this.state.submit ? (
+      <Redirect to="/" />
+    ) : (
       <form onSubmit={this.onFormSubmit}>
         <p>
           <label htmlFor="email">Email</label>
@@ -50,4 +55,3 @@ export default class RegisterForm extends Component {
     );
   }
 }
-

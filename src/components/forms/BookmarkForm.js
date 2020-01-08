@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import axios from "axios";
+import API from "../api";
 
 export default class BookmarkForm extends Component {
   state = {
@@ -18,13 +18,10 @@ export default class BookmarkForm extends Component {
   onFormSubmit = event => {
     const { title, url } = this.state;
     event.preventDefault();
-    axios
+    API
       .post(
-        "http://localhost:3001/bookmarks",
-        { title, url },
-        {
-          headers: { Authorization: "Bearer " + sessionStorage.getItem("token") }
-        }
+        "/bookmarks",
+        { title, url }
       )
       .then(res => this.props.updateBookmarks(res.data));
   };
